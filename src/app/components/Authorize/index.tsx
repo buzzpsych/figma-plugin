@@ -5,7 +5,7 @@ import { UserOutlined, LoadingOutlined } from '@ant-design/icons';
 const Authorize = () => {
   const [loading, setLoading] = useState(false);
   onmessage = async (event) => {
-    window.open(`http://localhost:3000/authorize?app=figma&state=${event?.data?.pluginMessage}`, '_blank');
+    window.open(`https://app.windu.io/authorize?app=figma&state=${event?.data?.pluginMessage}`, '_blank');
     parent.postMessage({ pluginMessage: { success: true }, pluginId: '*' }, '*');
     setLoading(true);
   };

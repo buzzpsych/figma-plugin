@@ -11,7 +11,7 @@ const pluginUi = {
     y: figma.viewport.bounds.y,
   },
 };
-
+figma.clientStorage.deleteAsync('windu');
 figma.clientStorage.getAsync('windu').then((t) => {
   if (t?.length === 0 || t?.length === undefined) {
     // token has not already been acquired from auth via windu
@@ -23,39 +23,50 @@ figma.clientStorage.getAsync('windu').then((t) => {
     figma.ui.onmessage = (message) => {
       // wait from auth page to send success and then direct to figma app
       if (message.success) {
-        figma.showUI(`<script>window.location.href='http://localhost:3000/figma?id=${figmaId}'</script>`, {
+        figma.showUI(`<script>window.location.href='https://app.windu.io/figma?id=${figmaId}'</script>`, {
           ...pluginUi,
         });
       }
       if (message.save) {
         figma.clientStorage.setAsync('windu', message.value);
       }
-      if (message.addReference) {
-        captureImageSelection();
-      }
-      handleExpandToggle(message); ///
+
+      handleMessaging();
     };
   } else {
-    figma.showUI(`<script>window.location.href='http://localhost:3000/figma?id=${figmaId}'</script>`, { ...pluginUi });
-
-    figma.ui.onmessage = (message) => {
-      console.log(message);
-      if (message?.activity?.active) {
-        figma.clientStorage.setAsync('active', message?.activity?.active);
-        figma.ui.resize(message?.activity?.active ? 350 : pluginUi.width, pluginUi.height);
-      } else {
-        figma.clientStorage.setAsync('active', false);
-        figma.ui.resize(message?.activity?.active ? 350 : pluginUi.width, pluginUi.height);
-      }
-
-      if (message.addReference) {
-        captureImageSelection();
-      }
-
-      handleExpandToggle(message);
-    };
+    figma.showUI(`<script>window.location.href='https://app.windu.io/figma?id=${figmaId}'</script>`, { ...pluginUi });
+    handleMessaging();
   }
 });
+
+const handleMessaging = () => {
+  figma.ui.onmessage = (message) => {
+    if (message?.activity?.active) {
+      figma.clientStorage.setAsync('active', message?.activity?.active);
+      figma.ui.resize(
+        message?.activity?.active ? 350 : pluginUi.width,
+        figma.currentPage.selection[0] !== undefined ? (message.expand ? 450 : 82) : pluginUi.height
+      );
+    } else {
+      figma.clientStorage.setAsync('active', false);
+      figma.ui.resize(
+        message?.activity?.active ? 350 : pluginUi.width,
+        figma.currentPage.selection[0] !== undefined ? 82 : pluginUi.height
+      );
+    }
+
+    if (message.addReference) {
+      captureImageSelection();
+    }
+    if (message.handOffModal) {
+      figma.ui.resize(
+        message?.activity?.active ? 350 : pluginUi.width,
+        figma.currentPage.selection[0] !== undefined ? 450 : 400
+      );
+    }
+    handleExpandToggle(message);
+  };
+};
 
 const handleExpandToggle = (message) => {
   figma.clientStorage.setAsync('expand', message.expand);
