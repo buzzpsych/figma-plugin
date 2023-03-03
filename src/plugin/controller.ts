@@ -11,7 +11,6 @@ const pluginUi = {
     y: figma.viewport.bounds.y,
   },
 };
-figma.clientStorage.deleteAsync('windu');
 figma.clientStorage.getAsync('windu').then((t) => {
   if (t?.length === 0 || t?.length === undefined) {
     // token has not already been acquired from auth via windu
