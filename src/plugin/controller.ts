@@ -26,9 +26,6 @@ figma.clientStorage.getAsync('windu').then((t) => {
           ...pluginUi,
         });
       }
-      if (message.save) {
-        figma.clientStorage.setAsync('windu', message.value);
-      }
 
       handleMessaging();
     };
@@ -40,6 +37,10 @@ figma.clientStorage.getAsync('windu').then((t) => {
 
 const handleMessaging = () => {
   figma.ui.onmessage = (message) => {
+    if (message.save) {
+      figma.clientStorage.setAsync('windu', message.value);
+    }
+
     if (message?.activity?.active) {
       figma.clientStorage.setAsync('active', message?.activity?.active);
       figma.ui.resize(
